@@ -12,7 +12,7 @@ import javax.mail.Session;
 public class EnviarMail {
     public String send(String sendTo,String body) {
         final String fromEmail = "apisacount@gmail.com";
-        final String password = "kevin3148876034";
+        final String password = "fqqhrjaivdgwhzfj";
         final String toEmail = sendTo;
 
         Properties props = new Properties();
