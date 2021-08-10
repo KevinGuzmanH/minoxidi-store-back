@@ -11,7 +11,7 @@ import javax.mail.Session;
 @Component
 public class EnviarMail {
     public String send(String sendTo,String body) {
-        final String fromEmail = "kevinyorney123@gmail.com";
+        final String fromEmail = "apisacount@gmail.com";
         final String password = "kevin3148876034";
         final String toEmail = sendTo;
 

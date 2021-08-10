@@ -30,7 +30,7 @@ public class EmailUtil {
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
             Transport.send(msg);
 
-            return "mensaje Enviado Revisa el Correo Electronico";
+            return "Mensaje Enviado Revisa el Correo Electronico";
         }
         catch (Exception e) {
             e.printStackTrace();
