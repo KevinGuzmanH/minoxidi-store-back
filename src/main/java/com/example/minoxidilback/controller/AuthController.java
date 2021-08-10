@@ -1,5 +1,6 @@
 package com.example.minoxidilback.controller;
 
+import com.example.minoxidilback.dto.EnviarMail;
 import com.example.minoxidilback.dto.JwtDto;
 import com.example.minoxidilback.dto.LoginUsuario;
 import com.example.minoxidilback.dto.NuevoUsuario;
@@ -20,12 +21,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+
+
 import javax.validation.Valid;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 @RestController
@@ -46,6 +51,11 @@ public class AuthController {
 
     @Autowired
     JwtProvider jwtProvider;
+
+    @Autowired
+    EnviarMail enviarMail;
+
+    private final static Logger logger = LoggerFactory.getLogger(JwtEntryPoint.class);
 
     @PostMapping("/nuevo")
     public ResponseEntity<?> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
@@ -70,8 +80,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<JwtDto> login(@Valid @RequestBody LoginUsuario loginUsuario, BindingResult bindingResult){
         if (!usuarioService.existsByNombreUsuario(loginUsuario.getNombreUsuario())){
-            return new ResponseEntity("Esta cuenta no existe por favor registrese", HttpStatus.BAD_REQUEST);
-
+            return new ResponseEntity("Ese nombre de usuario no existe por favor registrese", HttpStatus.BAD_REQUEST);
+        }
+        if (!passwordEncoder.matches(loginUsuario.getPassword(),usuarioService.getByNombreUsuario(loginUsuario.getNombreUsuario()).get().getPassword())){
+            return new ResponseEntity("Contraseña Incorrecta",HttpStatus.BAD_REQUEST);
         }
         if(bindingResult.hasErrors())
             return new ResponseEntity("Campos mal puestos", HttpStatus.BAD_REQUEST);
@@ -80,6 +92,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtProvider.generateToken(authentication);
         UserDetails userDetails = (UserDetails)authentication.getPrincipal();
+
         JwtDto jwtDto = new JwtDto(jwt, userDetails.getUsername(),usuarioService.getByNombreUsuario(loginUsuario.getNombreUsuario()).get().getEmail(), userDetails.getAuthorities());
         return new ResponseEntity(jwtDto, HttpStatus.OK);
     }
@@ -93,4 +106,37 @@ public class AuthController {
         usuarioService.save(usuario);
         return new ResponseEntity("Gracias... Ahora Estas Suscrito",HttpStatus.OK);
     }
+
+    @GetMapping("/recuperar/{correo}")
+    public ResponseEntity<String> recuperarPws(@PathVariable ("correo") String correo ) {
+        if (!usuarioService.existsByEmail(correo)){
+            return new ResponseEntity<String>("No hay ninguna cuenta asosiada a este correo",HttpStatus.BAD_REQUEST);
+        }
+        String token = jwtProvider.generateTokenResetPwd(correo);
+
+        String link = "https://minoxidil-nm.herokuapp.com/inicio/recuperar/changepwd;token=";
+        String sendTo = correo;
+        String mensaje = enviarMail.send(sendTo,"Sigue este link para recuperar tu cuenta " + link + token);
+        return new ResponseEntity<String>(mensaje,HttpStatus.OK);
+    }
+
+    @GetMapping("/validartoken/{token}")
+    public ResponseEntity<Boolean> validarToken(@PathVariable("token") String token) {
+        if (token.isEmpty()) {
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(jwtProvider.validateToken(token),HttpStatus.OK);
+    }
+    @GetMapping("/cambiarpwd/{token}/{nuevapwd}")
+    public ResponseEntity<String> cambiarPwd(@PathVariable("token") String token,@PathVariable("nuevapwd") String nuevapwd) {
+       if (jwtProvider.validateToken(token)){
+           Usuario user = usuarioService.getByCorreo(jwtProvider.getNombreUsuarioFromToken(token)).get();
+           user.setPassword(passwordEncoder.encode(nuevapwd));
+           usuarioService.save(user);
+           return new ResponseEntity<>("Contraseña Actualizada, Inicia Sesión",HttpStatus.OK);
+       }
+        return new ResponseEntity<>("Sesión Expirada Reintente Por Favor",HttpStatus.BAD_REQUEST);
+    }
+
 }
+

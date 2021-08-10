@@ -29,6 +29,14 @@ public class JwtProvider {
                 .compact();
     }
 
+    public String generateTokenResetPwd(String correoUser){
+        return Jwts.builder().setSubject(correoUser)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + expiration * 3))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
+    }
+
     public String getNombreUsuarioFromToken(String token){
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
