@@ -40,7 +40,7 @@ public class JwtProvider {
                 .build();
     }
 
-    public String generateTokenResetPwd(String correoUser){
+    public String generateTokenRecoverPwd(String correoUser){
         return Jwts.builder().setSubject(correoUser)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + EXPIRATION * 1))

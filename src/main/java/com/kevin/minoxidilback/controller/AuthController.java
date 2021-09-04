@@ -24,17 +24,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -67,25 +63,7 @@ public class AuthController {
 
     @Autowired
     Gson gson;
-    private final static Logger logger = LoggerFactory.getLogger(JwtEntryPoint.class);
-
-    @PreAuthorize("permitAll()")
-    @GetMapping(path = "/cookie")
-    public ResponseEntity<String> cokkie(HttpServletResponse response){
-        Cookie cookie = new Cookie("prueba","valorando");
-        cookie.setHttpOnly(false);
-        cookie.setSecure(false);
-        cookie.setDomain("cookieff.herokuapp.com");
-        response.addCookie(cookie);
-        return new ResponseEntity<>(gson.toJson("asd"),HttpStatus.OK);
-    }
-    @PreAuthorize("permitAll()")
-    @GetMapping(path = "/cookieread")
-    public ResponseEntity<String> cokkieread(@CookieValue (value = "prueba",defaultValue = "Atta") String cookie){
-        logger.info(cookie);
-        return new ResponseEntity<>(gson.toJson("asd"),HttpStatus.OK);
-    }
-
+    
     @PreAuthorize("permitAll()")
     @PostMapping(path = "/new",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
@@ -101,9 +79,7 @@ public class AuthController {
         usuario.setRoles(roles);
         usuarioService.save(usuario);
 
-        if (!this.sendConfirmationEmail(nuevoUsuario.getEMAIL())){
-            return new ResponseEntity<>( gson.toJson("Email Invalido"),HttpStatus.OK);
-        }
+        this.sendConfirmationEmail(nuevoUsuario.getEMAIL());
 
         usuario.setRoles(roles);
         return new ResponseEntity(gson.toJson("Revisa tu correo electronico para activar tu cuenta"), HttpStatus.CREATED);
@@ -143,7 +119,7 @@ public class AuthController {
         }
         String token = jwtProvider.generateTokenConfirmEmail(email);
 
-        String link = "https://minoxidil-nm.herokuapp.com/inicio/recuperar/changepwd;token=" + token;
+        String link = "https://minoxidilfront.herokuapp.com/inicio/recuperar/changepwd;token=" + token;
         String sendTo = email;
         enviarMail.send(sendTo, link,false );
         return new ResponseEntity<String>(gson.toJson("Revise Su Correo Electronico"),HttpStatus.OK);
@@ -163,28 +139,28 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @GetMapping(path = "/sendConfirmationEmail",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-    public boolean sendConfirmationEmail(@RequestHeader ("email") String email ) {
+    public ResponseEntity<String> sendConfirmationEmail(@RequestHeader ("email") String email ) {
         if (!usuarioService.existsByEmail(email)){
-            return false;
+            return new ResponseEntity<>("No hay ninguna cuenta asosiada a este correo",HttpStatus.OK);
         }
-        String token = jwtProvider.generateTokenResetPwd(email);
+        String token = jwtProvider.generateTokenConfirmEmail(email);
 
-        String link = "https://minoxidil-nm.herokuapp.com/inicio/confirm/confirmEmail;token=" + token;
+        String link = "https://minoxidilfront.herokuapp.com/inicio/confirmEmail/verifyToken;token=" + token;
         String sendTo = email;
         enviarMail.send(sendTo, link,true );
-        return true;
+        return new ResponseEntity<>(gson.toJson("Email Enviado Revisa Tu Correo Electronico"),HttpStatus.OK);
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("/confirmemail")
-    public ResponseEntity<String> confirmEmail(@RequestParam ("access_token") String token) {
+    public ResponseEntity<String> confirmEmail(@RequestHeader ("access_token") String token) {
         if (jwtProvider.validateToken(token)){
           Usuario user = usuarioService.getByEmail(jwtProvider.getEmailFromToken(token)).get();
             user.setENABLED(true);
             usuarioService.save(user);
             return new ResponseEntity<>(gson.toJson(true),HttpStatus.OK);
         }
-        return new ResponseEntity<String>(gson.toJson(false),HttpStatus.OK);
+        return new ResponseEntity<String>(gson.toJson(false),HttpStatus.UNAUTHORIZED    );
     }
 
     @PreAuthorize("authenticated")
