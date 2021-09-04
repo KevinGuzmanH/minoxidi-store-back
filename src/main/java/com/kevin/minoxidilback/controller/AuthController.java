@@ -73,6 +73,9 @@ public class AuthController {
     @GetMapping(path = "/cookie")
     public ResponseEntity<String> cokkie(HttpServletResponse response){
         Cookie cookie = new Cookie("prueba","valorando");
+        cookie.setHttpOnly(false);
+        cookie.setSecure(false);
+        cookie.setDomain("cookieff.herokuapp.com");
         response.addCookie(cookie);
         return new ResponseEntity<>(gson.toJson("asd"),HttpStatus.OK);
     }
