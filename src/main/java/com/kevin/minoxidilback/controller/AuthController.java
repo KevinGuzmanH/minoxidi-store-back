@@ -63,7 +63,7 @@ public class AuthController {
 
     @Autowired
     Gson gson;
-    
+
     @PreAuthorize("permitAll()")
     @PostMapping(path = "/new",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
