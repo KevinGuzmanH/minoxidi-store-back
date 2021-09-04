@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://ec2-18-214-195-34.compute-1.amazonaws.com:5432/dcg2kmjml55i8r
+    username: hvjsvegdfnfsbc
+    password: eb501422d8c2a53b50285a1dde20a99a563239d98182b22bc42edb40defac4d1
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+  mail:
+    username: ElGRANBARON
+    password: kevin3148876034
+    from:
+      email: kevinyorney123@gmail.com
+jwt:
+  expiration: 1300000
+  secret: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCV6vyzB3QTeB5w
+
+server:
+  port: 4000
