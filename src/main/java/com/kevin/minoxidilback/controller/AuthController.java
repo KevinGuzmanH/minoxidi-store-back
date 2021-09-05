@@ -30,7 +30,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -66,7 +65,7 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping(path = "/new")
-    public ResponseEntity<String> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
+    public ResponseEntity<String> nuevo(@RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
         if(bindingResult.hasErrors())
             return new ResponseEntity(gson.toJson("Campos mal puestos o email inválido"), HttpStatus.BAD_REQUEST);
         if(usuarioService.existsByEmail(nuevoUsuario.getEMAIL()))
@@ -87,7 +86,7 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping(path = "/login",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JwtDto> login(@Valid @RequestBody LoginUsuario loginUsuario, BindingResult bindingResult){
+    public ResponseEntity<JwtDto> login(@RequestBody LoginUsuario loginUsuario, BindingResult bindingResult){
         if (!usuarioService.existsByEmail(loginUsuario.getEMAIL())){
             return new ResponseEntity(gson.toJson("Ese Correo Electronico No Está Asociado a Ninguna Cuenta"), HttpStatus.BAD_REQUEST);
         }
