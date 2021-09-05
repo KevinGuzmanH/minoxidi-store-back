@@ -65,9 +65,7 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping(path = "/new")
-    public ResponseEntity<String> nuevo(@RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
-        if(bindingResult.hasErrors())
-            return new ResponseEntity(gson.toJson("Campos mal puestos o email inválido"), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> nuevo(@RequestBody NuevoUsuario nuevoUsuario){
         if(usuarioService.existsByEmail(nuevoUsuario.getEMAIL()))
             return new ResponseEntity(gson.toJson("Ese email ya esta vinculado a otra cuenta"), HttpStatus.BAD_REQUEST);
         Usuario usuario =
@@ -86,7 +84,7 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping(path = "/login",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JwtDto> login(@RequestBody LoginUsuario loginUsuario, BindingResult bindingResult){
+    public ResponseEntity<JwtDto> login(@RequestBody LoginUsuario loginUsuario){
         if (!usuarioService.existsByEmail(loginUsuario.getEMAIL())){
             return new ResponseEntity(gson.toJson("Ese Correo Electronico No Está Asociado a Ninguna Cuenta"), HttpStatus.BAD_REQUEST);
         }
@@ -97,10 +95,6 @@ public class AuthController {
             this.sendConfirmationEmail(loginUsuario.getEMAIL());
             return new ResponseEntity(gson.toJson("Cuenta No Verificada Revisa Tu Correo Electronico"),HttpStatus.UNAUTHORIZED);
         }
-        if(bindingResult.hasErrors())
-            return new ResponseEntity(gson.toJson("Campos mal puestos"), HttpStatus.BAD_REQUEST);
-        Logger logger = LoggerFactory.getLogger(JwtEntryPoint.class);
-        logger.info(loginUsuario.toString());
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUsuario.getEMAIL(), loginUsuario.getPASSWORD()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
