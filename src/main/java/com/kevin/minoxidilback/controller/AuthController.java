@@ -65,7 +65,7 @@ public class AuthController {
     Gson gson;
 
     @PreAuthorize("permitAll()")
-    @PostMapping(path = "/new",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/new")
     public ResponseEntity<String> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
         if(bindingResult.hasErrors())
             return new ResponseEntity(gson.toJson("Campos mal puestos o email inválido"), HttpStatus.BAD_REQUEST);

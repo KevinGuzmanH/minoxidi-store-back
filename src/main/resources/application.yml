@@ -19,4 +19,4 @@ jwt:
   secret: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCV6vyzB3QTeB5w
 
 server:
-  port: 4000
+  port: 4010
