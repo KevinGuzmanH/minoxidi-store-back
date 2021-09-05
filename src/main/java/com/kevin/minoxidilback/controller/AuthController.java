@@ -8,14 +8,11 @@ import com.kevin.minoxidilback.entity.Orden;
 import com.kevin.minoxidilback.entity.Rol;
 import com.kevin.minoxidilback.entity.Usuario;
 import com.kevin.minoxidilback.enums.RolNombre;
-import com.kevin.minoxidilback.jwt.JwtEntryPoint;
 import com.kevin.minoxidilback.jwt.JwtProvider;
 import com.kevin.minoxidilback.service.OrdenService;
 import com.kevin.minoxidilback.service.RolService;
 import com.kevin.minoxidilback.service.UsuarioService;
 import com.google.gson.Gson;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -65,9 +63,11 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping(path = "/new")
-    public ResponseEntity<String> nuevo(@RequestBody NuevoUsuario nuevoUsuario){
+    public ResponseEntity<String> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
         if(usuarioService.existsByEmail(nuevoUsuario.getEMAIL()))
             return new ResponseEntity(gson.toJson("Ese email ya esta vinculado a otra cuenta"), HttpStatus.BAD_REQUEST);
+        if(bindingResult.hasErrors())
+            return new ResponseEntity("Campos mal puestos o email inválido", HttpStatus.BAD_REQUEST);
         Usuario usuario =
                 new Usuario(nuevoUsuario.getFIRSTNAME(),nuevoUsuario.getLASTNAME(), nuevoUsuario.getEMAIL(),
                             nuevoUsuario.getPROVIDER(),nuevoUsuario.getPHONE(), passwordEncoder.encode(nuevoUsuario.getPASSWORD()));

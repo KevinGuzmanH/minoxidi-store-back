@@ -1,14 +1,11 @@
 package com.kevin.minoxidilback.dto;
 
-import lombok.Builder;
-import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
-@Data
-@Builder
+
 public class NuevoUsuario {
 
     @NotBlank
@@ -24,15 +21,59 @@ public class NuevoUsuario {
     private String PASSWORD;
     private Set<String> ROLES;
 
-    public NuevoUsuario() {}
+    public String getFIRSTNAME() {
+        return FIRSTNAME;
+    }
 
-    public NuevoUsuario(String FIRSTNAME, String LASTNAME, String EMAIL, String PROVIDER, String PHONE, String PASSWORD, Set<String> ROLES) {
+    public void setFIRSTNAME(String FIRSTNAME) {
         this.FIRSTNAME = FIRSTNAME;
+    }
+
+    public String getLASTNAME() {
+        return LASTNAME;
+    }
+
+    public void setLASTNAME(String LASTNAME) {
         this.LASTNAME = LASTNAME;
+    }
+
+    public String getEMAIL() {
+        return EMAIL;
+    }
+
+    public void setEMAIL(String EMAIL) {
         this.EMAIL = EMAIL;
+    }
+
+    public String getPROVIDER() {
+        return PROVIDER;
+    }
+
+    public void setPROVIDER(String PROVIDER) {
         this.PROVIDER = PROVIDER;
+    }
+
+    public String getPHONE() {
+        return PHONE;
+    }
+
+    public void setPHONE(String PHONE) {
         this.PHONE = PHONE;
+    }
+
+    public String getPASSWORD() {
+        return PASSWORD;
+    }
+
+    public void setPASSWORD(String PASSWORD) {
         this.PASSWORD = PASSWORD;
+    }
+
+    public Set<String> getROLES() {
+        return ROLES;
+    }
+
+    public void setROLES(Set<String> ROLES) {
         this.ROLES = ROLES;
     }
 }

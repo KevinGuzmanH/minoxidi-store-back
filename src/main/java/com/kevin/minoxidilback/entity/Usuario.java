@@ -1,7 +1,6 @@
 package com.kevin.minoxidilback.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+
 @Entity
 @Table(name = "usuario")
 public class Usuario implements UserDetails {
@@ -55,6 +54,86 @@ public class Usuario implements UserDetails {
         this.PROVIDER = PROVIDER;
         this.PHONE = PHONE;
         this.PASSWORD = PASSWORD;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
+    public String getFIRSTNAME() {
+        return FIRSTNAME;
+    }
+
+    public void setFIRSTNAME(String FIRSTNAME) {
+        this.FIRSTNAME = FIRSTNAME;
+    }
+
+    public String getLASTNAME() {
+        return LASTNAME;
+    }
+
+    public void setLASTNAME(String LASTNAME) {
+        this.LASTNAME = LASTNAME;
+    }
+
+    public String getEMAIL() {
+        return EMAIL;
+    }
+
+    public void setEMAIL(String EMAIL) {
+        this.EMAIL = EMAIL;
+    }
+
+    public String getPROVIDER() {
+        return PROVIDER;
+    }
+
+    public void setPROVIDER(String PROVIDER) {
+        this.PROVIDER = PROVIDER;
+    }
+
+    public String getPHONE() {
+        return PHONE;
+    }
+
+    public void setPHONE(String PHONE) {
+        this.PHONE = PHONE;
+    }
+
+    public String getPASSWORD() {
+        return PASSWORD;
+    }
+
+    public void setPASSWORD(String PASSWORD) {
+        this.PASSWORD = PASSWORD;
+    }
+
+    public boolean isENABLED() {
+        return ENABLED;
+    }
+
+    public void setENABLED(boolean ENABLED) {
+        this.ENABLED = ENABLED;
+    }
+
+    public Set<Orden> getOrdenes() {
+        return ordenes;
+    }
+
+    public void setOrdenes(Set<Orden> ordenes) {
+        this.ordenes = ordenes;
+    }
+
+    public Set<Rol> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Rol> roles) {
+        this.roles = roles;
     }
 
     @Override

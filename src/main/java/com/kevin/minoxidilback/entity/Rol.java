@@ -1,12 +1,11 @@
 package com.kevin.minoxidilback.entity;
 
 import com.kevin.minoxidilback.enums.RolNombre;
-import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-@Data
+
 @Entity
 public class Rol {
     @Id
@@ -23,4 +22,19 @@ public class Rol {
         this.rolNombre = rolNombre;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public RolNombre getRolNombre() {
+        return rolNombre;
+    }
+
+    public void setRolNombre(RolNombre rolNombre) {
+        this.rolNombre = rolNombre;
+    }
 }

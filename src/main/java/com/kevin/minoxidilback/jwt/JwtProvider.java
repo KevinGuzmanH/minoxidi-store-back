@@ -7,9 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class JwtProvider {
@@ -31,13 +34,11 @@ public class JwtProvider {
         return generateJwtDto(token);
     }
 
-    public JwtDto generateJwtDto(String token){
+    public JwtDto generateJwtDto(String token) {
         Claims parseToken = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
-        return JwtDto.builder()
-                .access_token(token)
-                .expires_in(parseToken.getExpiration())
-                .token_type("Bearer")
-                .build();
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+          JwtDto jwtDto = new JwtDto(token,"Bearer",parseToken.getExpiration(),authorities);
+          return jwtDto;
     }
 
     public String generateTokenRecoverPwd(String correoUser){
