@@ -23,4 +23,5 @@ public class JwtDto {
     @NotNull
     private Set<SimpleGrantedAuthority> auth;
 
+    public JwtDto( ) {}
 }

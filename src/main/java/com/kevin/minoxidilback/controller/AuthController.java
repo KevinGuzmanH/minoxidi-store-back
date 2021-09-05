@@ -110,7 +110,7 @@ public class AuthController {
         if (!usuarioService.existsByEmail(email)){
             return new ResponseEntity<String>(gson.toJson("No hay ninguna cuenta asosiada a este correo"),HttpStatus.BAD_REQUEST);
         }
-        String token = jwtProvider.generateTokenConfirmEmail(email);
+        String token = jwtProvider.generateTokenRecoverPwd(email);
 
         String link = "https://minoxidilfront.herokuapp.com/inicio/recuperar/changepwd;token=" + token;
         String sendTo = email;
