@@ -13,9 +13,10 @@ import com.kevin.minoxidilback.service.OrdenService;
 import com.kevin.minoxidilback.service.RolService;
 import com.kevin.minoxidilback.service.UsuarioService;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,10 +25,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,14 +62,17 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping(path = "/new")
-    public ResponseEntity<String> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
+    public ResponseEntity<String> nuevo(@RequestBody NuevoUsuario nuevoUsuario){
         if(usuarioService.existsByEmail(nuevoUsuario.getEMAIL()))
             return new ResponseEntity(gson.toJson("Ese email ya esta vinculado a otra cuenta"), HttpStatus.BAD_REQUEST);
-        if(bindingResult.hasErrors())
-            return new ResponseEntity("Campos mal puestos o email inválido", HttpStatus.BAD_REQUEST);
+         Logger logger = LoggerFactory.getLogger(JwtProvider.class);
+        logger.info(nuevoUsuario.getFirstname());
+        logger.info(nuevoUsuario.getEMAIL());
+        logger.info(nuevoUsuario.getLastname());
+        logger.info(nuevoUsuario.getPassword());
         Usuario usuario =
-                new Usuario(nuevoUsuario.getFIRSTNAME(),nuevoUsuario.getLASTNAME(), nuevoUsuario.getEMAIL(),
-                            nuevoUsuario.getPROVIDER(),nuevoUsuario.getPHONE(), passwordEncoder.encode(nuevoUsuario.getPASSWORD()));
+                new Usuario(nuevoUsuario.getFirstname(),nuevoUsuario.getLastname(), nuevoUsuario.getEMAIL(),
+                            nuevoUsuario.getPROVIDER(),nuevoUsuario.getPHONE(), passwordEncoder.encode(nuevoUsuario.getPassword()));
         Set<Rol> roles = new HashSet<>();
         roles.add(rolService.getByRolNombre(RolNombre.ROLE_USER).get());
         usuario.setRoles(roles);
@@ -83,8 +85,8 @@ public class AuthController {
     }
 
     @PreAuthorize("permitAll()")
-    @PostMapping(path = "/login",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JwtDto> login(@RequestBody LoginUsuario loginUsuario){
+    @PostMapping(path = "/login")
+    public ResponseEntity<JwtDto> login( @RequestBody LoginUsuario loginUsuario){
         if (!usuarioService.existsByEmail(loginUsuario.getEMAIL())){
             return new ResponseEntity(gson.toJson("Ese Correo Electronico No Está Asociado a Ninguna Cuenta"), HttpStatus.BAD_REQUEST);
         }
@@ -105,7 +107,7 @@ public class AuthController {
     }
 
     @PreAuthorize("permitAll()")
-    @GetMapping(path = "/sendRecoverPwd",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/sendRecoverPwd")
     public ResponseEntity<String> recuperarPws(@RequestHeader ("email") String email ) {
         if (!usuarioService.existsByEmail(email)){
             return new ResponseEntity<String>(gson.toJson("No hay ninguna cuenta asosiada a este correo"),HttpStatus.BAD_REQUEST);
@@ -119,7 +121,7 @@ public class AuthController {
     }
 
     @PreAuthorize("permitAll()")
-    @GetMapping(path = "/changePwd",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/changePwd")
     public ResponseEntity<String> changePwd(@RequestHeader("access_token") String token,@RequestHeader("newpwd") String newPwd) {
         if (jwtProvider.validateToken(token)){
             Usuario user = usuarioService.getByEmail(jwtProvider.getEmailFromToken(token)).get();
@@ -131,7 +133,7 @@ public class AuthController {
     }
 
     @PreAuthorize("permitAll()")
-    @GetMapping(path = "/sendConfirmationEmail",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/sendConfirmationEmail")
     public ResponseEntity<String> sendConfirmationEmail(@RequestHeader ("email") String email ) {
         if (!usuarioService.existsByEmail(email)){
             return new ResponseEntity<>("No hay ninguna cuenta asosiada a este correo",HttpStatus.OK);
@@ -157,7 +159,7 @@ public class AuthController {
     }
 
     @PreAuthorize("authenticated")
-    @GetMapping(path = "/validateToken",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/validateToken")
     public ResponseEntity<String> validarToken(@RequestHeader ("access_token") String token) {
         if (token.isEmpty()) {
             return new ResponseEntity<>(gson.toJson(false), HttpStatus.BAD_REQUEST);
@@ -166,7 +168,7 @@ public class AuthController {
     }
 
     @PreAuthorize("authenticated")
-    @PostMapping(path = "/registerOrder",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/registerOrder")
     public ResponseEntity<String> registerOrder(@RequestHeader("access_token") String token, @RequestHeader("amount") int amount){
         Date date = new Date();
         Orden newOrder = new Orden(usuarioService.getByEmail(jwtProvider.getEmailFromToken(token)).get(),date,amount);

@@ -9,32 +9,45 @@ import java.util.Set;
 public class NuevoUsuario {
 
     @NotBlank
-    private String FIRSTNAME;
+    private String firstname;
     @NotBlank
-    private String LASTNAME;
+    private String lastname;
     @Email
     private String EMAIL;
     @NotBlank
     private String PROVIDER;
     private String PHONE;
     @NotBlank
-    private String PASSWORD;
+    private String password;
     private Set<String> ROLES;
 
-    public String getFIRSTNAME() {
-        return FIRSTNAME;
+    public NuevoUsuario() {
     }
 
-    public void setFIRSTNAME(String FIRSTNAME) {
-        this.FIRSTNAME = FIRSTNAME;
+    public NuevoUsuario(String firstname, String lastname, String EMAIL, String PROVIDER, String PHONE, String password, Set<String> ROLES) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.EMAIL = EMAIL;
+        this.PROVIDER = PROVIDER;
+        this.PHONE = PHONE;
+        this.password = password;
+        this.ROLES = ROLES;
     }
 
-    public String getLASTNAME() {
-        return LASTNAME;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setLASTNAME(String LASTNAME) {
-        this.LASTNAME = LASTNAME;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
     public String getEMAIL() {
@@ -61,12 +74,12 @@ public class NuevoUsuario {
         this.PHONE = PHONE;
     }
 
-    public String getPASSWORD() {
-        return PASSWORD;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPASSWORD(String PASSWORD) {
-        this.PASSWORD = PASSWORD;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Set<String> getROLES() {

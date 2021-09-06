@@ -10,6 +10,14 @@ public class LoginUsuario {
     @NotBlank
     private String PASSWORD;
 
+    public LoginUsuario() {
+    }
+
+    public LoginUsuario(@NotBlank String EMAIL,@NotBlank String PASSWORD) {
+        this.EMAIL = EMAIL;
+        this.PASSWORD = PASSWORD;
+    }
+
     public String getEMAIL() {
         return EMAIL;
     }
